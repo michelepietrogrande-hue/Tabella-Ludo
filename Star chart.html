@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabella Stelle - Lavinia & Ludovica 🌟</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --lavinia-color: #ff7675;
+            --ludo-color: #74b9ff;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --dot-empty: #d1ccc0;
+            --dot-filled: #fdcb6e;
+            --text-color: #2d3436;
+            --main-font: 'Fredoka', sans-serif;
+        }
+
+        body {
+            font-family: var(--main-font);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 10px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container {
+            width: 100%; max-width: 1100px;
+            background: var(--card-bg);
+            padding: 20px; border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center; margin-bottom: 20px;
+            border-bottom: 3px dashed var(--primary-color);
+            padding-bottom: 20px;
+        }
+
+        /* Stile Tachimetri */
+        .score-board {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .gauge {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .gauge svg {
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+        }
+
+        .gauge circle {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+        }
+
+        .gauge .bg { stroke: #eee; }
+        
+        .gauge .progress {
+            stroke-dasharray: 345.5; /* Circosferenza 2 * PI * 55 */
+            stroke-dashoffset: 345.5;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .points-num { font-size: 1.8rem; font-weight: 600; display: block; line-height: 1; }
+        .medal-mini { font-size: 1.2rem; }
+
+        .child-label { font-size: 1.2rem; font-weight: 600; margin-top: 10px; }
+
+        /* Tabella */
+        .table-wrapper { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background-color: var(--primary-color); color: white; padding: 12px; font-size: 0.9rem; border-radius: 5px; }
+        td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; }
+
+        .category-title { 
+            text-align: left; font-weight: 600; color: #4a4a4a; 
+            font-size: 1rem; padding: 15px 10px 5px 10px; background: #fcfcfc;
+        }
+
+        .child-row-label {
+            text-align: left; font-size: 0.9rem; padding-left: 30px;
+            font-weight: 600; width: 220px;
+        }
+
+        .dots-container { display: flex; justify-content: center; gap: 8px; }
+        .dot { 
+            font-size: 24px; color: var(--dot-empty); cursor: pointer; 
+            transition: 0.2s; user-select: none;
+        }
+        .dot.active { color: var(--dot-filled); transform: scale(1.15); }
+
+        .btn-reset { 
+            margin-top: 30px; padding: 12px 25px; 
+            border: none; border-radius: 50px; 
+            background-color: #dfe6e9; color: #636e72; cursor: pointer;
+            font-family: var(--main-font); font-weight: 600;
+        }
+
+        #celebration {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 4rem; display: none; z-index: 1000;
+            animation: popIn 1s ease-out forwards; color: var(--primary-color);
+            font-weight: 600; pointer-events: none;
+        }
+
+        @keyframes popIn { 0% { scale: 0; } 50% { scale: 1.2; } 100% { scale: 1; opacity: 0; } }
+
+        @media (max-width: 600px) {
+            .child-row-label { width: 110px; padding-left: 10px; }
+            .gauge { width: 90px; height: 90px; }
+            .gauge svg { width: 90px; height: 90px; }
+            .score-board { gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="celebration">BRAVISSIMA! 🌟</div>
+
+<div class="container">
+    <header>
+        <h1 style="margin:0; color: var(--primary-color)">Super Star Chart</h1>
+        
+        <div class="score-board">
+            <div class="gauge-container">
+                <div class="gauge">
+                    <svg>
+                        <circle class="bg" cx="60" cy="60" r="55"></circle>
+                        <circle id="progress-0" class="progress" cx="60" cy="60" r="55" style="stroke: var(--lavinia-color);"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <span id="points-0" class="points-num">0</span>
+                        <span id="medal-0" class="medal-mini">⚪</span>
+                    </div>
+                </div>
+                <span class="child-label lavinia-text">Lavinia</span>
+            </div>
+
+            <div class="gauge-container">
+                <div class="gauge">
+                    <svg>
+                        <circle class="bg" cx="60" cy="60" r="55"></circle>
+                        <circle id="progress-1" class="progress" cx="60" cy="60" r="55" style="stroke: var(--ludo-color);"></circle>
+                    </svg>
+                    <div class="gauge-text">
+                        <span id="points-1" class="points-num">0</span>
+                        <span id="medal-1" class="medal-mini">⚪</span>
+                    </div>
+                </div>
+                <span class="child-label ludo-text">Ludovica</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Attività</th>
+                    <th>Lun</th><th>Mar</th><th>Mer</th><th>Gio</th><th>Ven</th><th>Sab</th><th>Dom</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div style="text-align: center;">
+        <button class="btn-reset" onclick="resetTable()">🔄 Reset Settimana</button>
+    </div>
+</div>
+
+<script>
+    const children = ["Lavinia", "Ludovica"];
+    const categories = [
+        { name: "Morning Routine", icon: "☀️" },
+        { name: "School Behavior", icon: "📚" },
+        { name: "Table Manners", icon: "🍽️" },
+        { name: "Tidying Up", icon: "🧸" },
+        { name: "Respect & Rules", icon: "🤝" },
+        { name: "Bedtime Routine", icon: "🌙" },
+        { name: "Independence", icon: "🚀" }
+    ];
+
+    const maxPoints = categories.length * 7 * 3; // 147
+    const storageKey = 'superStarDuo_v3';
+
+    function load() {
+        const tbody = document.getElementById('tableBody');
+        const savedData = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+        categories.forEach((cat, cIdx) => {
+            const headRow = document.createElement('tr');
+            headRow.innerHTML = `<td colspan="8" class="category-title">${cat.icon} ${cat.name}</td>`;
+            tbody.appendChild(headRow);
+
+            children.forEach((child, childIdx) => {
+                const row = document.createElement('tr');
+                const childClass = childIdx === 0 ? 'lavinia-text' : 'ludo-text';
+                row.innerHTML = `<td class="child-row-label ${childClass}">${child}</td>`;
+                
+                for (let dIdx = 0; dIdx < 7; dIdx++) {
+                    const td = document.createElement('td');
+                    const container = document.createElement('div');
+                    container.className = 'dots-container';
+                    
+                    for (let sIdx = 0; sIdx < 3; sIdx++) {
+                        const dot = document.createElement('span');
+                        dot.className = 'dot';
+                        dot.innerHTML = '●';
+                        const id = `${childIdx}-${cIdx}-${dIdx}-${sIdx}`;
+                        if(savedData[id]) dot.classList.add('active');
+                        
+                        dot.onclick = () => {
+                            const isActivating = !dot.classList.contains('active');
+                            const allDots = container.querySelectorAll('.dot');
+                            const data = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+                            allDots.forEach((d, index) => {
+                                const thisId = `${childIdx}-${cIdx}-${dIdx}-${index}`;
+                                if (isActivating && index <= sIdx) {
+                                    d.classList.add('active');
+                                    data[thisId] = true;
+                                } else if (!isActivating && index >= sIdx) {
+                                    d.classList.remove('active');
+                                    delete data[thisId];
+                                }
+                            });
+
+                            localStorage.setItem(storageKey, JSON.stringify(data));
+                            if (sIdx === 2 && isActivating) showCelebration();
+                            updateTotals();
+                        };
+                        container.appendChild(dot);
+                    }
+                    td.appendChild(container);
+                    row.appendChild(td);
+                }
+                tbody.appendChild(row);
+            });
+        });
+        updateTotals();
+    }
+
+    function updateTotals() {
+        const data = JSON.parse(localStorage.getItem(storageKey)) || {};
+        const counts = [0, 0];
+        const circumference = 2 * Math.PI * 55;
+
+        Object.keys(data).forEach(key => {
+            const childIdx = key.split('-')[0];
+            counts[childIdx]++;
+        });
+
+        counts.forEach((count, idx) => {
+            document.getElementById(`points-${idx}`).innerText = count;
+            
+            // Aggiorna Tachimetro
+            const offset = circumference - (count / maxPoints) * circumference;
+            document.getElementById(`progress-${idx}`).style.strokeDashoffset = offset;
+
+            // Aggiorna Medaglia
+            const medal = document.getElementById(`medal-${idx}`);
+            if(count === 0) medal.innerText = "⚪";
+            else if(count < 40) medal.innerText = "🥉";
+            else if(count < 85) medal.innerText = "🥈";
+            else if(count < 130) medal.innerText = "🥇";
+            else medal.innerText = "🏆";
+        });
+    }
+
+    function showCelebration() {
+        const el = document.getElementById('celebration');
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 1500);
+    }
+
+    function resetTable() {
+        if(confirm("Vuoi azzerare tutto per la nuova settimana?")) {
+            localStorage.removeItem(storageKey);
+            location.reload();
+        }
+    }
+
+    load();
+</script>
+</body>
+</html>
